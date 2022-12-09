@@ -97,8 +97,6 @@ run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
 
 
-
-
 #-----------------------------------------------------------------#
 #---------  ONLINE LEARNING ALGORITHMS - HELPER FUCTIONS ---------#
 #-----------------------------------------------------------------#
@@ -116,4 +114,3 @@ get_gradient = function(x, y, b, reg){
     return(-y*x/ ( 1+ exp(y*sum(x*b) ) ) )
   }
 }
-

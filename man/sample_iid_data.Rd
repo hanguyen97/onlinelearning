@@ -14,7 +14,7 @@ sample_iid_data(
 )
 }
 \arguments{
-\item{reg}{sample data from either `reg="linear"` or `reg = "logistic"`}
+\item{reg}{sample data from either [reg="linear"] or [reg = "logistic"]}
 
 \item{n}{sample size}
 
@@ -25,6 +25,7 @@ sample_iid_data(
 \item{signal}{standard deviation of an independent Gaussian distribution with mean 0
 from which the non-zero coefs are drawn from}
 
+
 \item{noise}{standard deviation of a normal distribution with mean 0
 from which the error vector is drawn from}
 }
@@ -32,7 +33,6 @@ from which the error vector is drawn from}
 * `y` response vector
 * `X` signal data
 * `b` coef vector
-}
 \description{
 Sample i.i.d data
 }
