@@ -29,9 +29,7 @@ from which the non-zero betas are drawn from}
 from which the error vector is drawn from}
 }
 \value{
-* [y] response vector
-* [X] signal data
-* [b] beta vector
+test return
 }
 \description{
 Sample i.i.d data

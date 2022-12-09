@@ -9,10 +9,8 @@
 #' @param noise standard deviation of a normal distribution with mean 0
 #' from which the error vector is drawn from
 #'
-#' @returns
-#'* [y] response vector
-#'* [X] signal data
-#'* [b] beta vector
+#' @returns test return
+#' @export
 sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise=1) {
 
   # generate X, beta and error
