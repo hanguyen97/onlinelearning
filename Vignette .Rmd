@@ -1,0 +1,218 @@
+---
+title: "Online learning Algorithms"
+output: html_document
+date: "2022-12-09"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction 
+In this vignette we will implement code to carry out the following algorithms: Recursive <br>Least Squares(RLS), Online Gradient Descent (OGD), and Adaptive Gradient Descent. 
+<br> We will show you how these functions work with some simple examples. 
+<br> Finally we will show you how we gathered some of the results from our report. 
+
+# Recursive Least Squares
+```{r,error=TRUE,eval=FALSE}
+run_RLS( Y,X,initial = 0,invxtx = 10^6 * diag(nrow = dim(X)[2], ncol = dim(X)[2]),xty = matrix(0, nrow = dim(X)[2], ncol = 1),btrue = rep(0, dim(X)[2]))
+```
+
+<br> The function has several input arguments. 
+<br> Y is for your response vector. 
+<br>
+<br> X is for your design matrix. 
+<br>
+<br> Initial tells us how many data points you have used in your previous model. If initial <br>is zero we will compute the estimate for the regression parameters from scratch. If <br>initial is greater than 0 we will take your previous model (assuming later data points <br>are added to the bottom of the design matrix) and update it to reflect any new data <br>points received. 
+<br> 
+<br> The function outputs are the regression parameter estimates, the estimation errors,and prediction errors, beta,eeps,peps respectively. 
+<br>invxtx is $$(X^{T}X)^{-1}$$ from your previous model. If there is no previous model 
+<br> we inialise the algorithm with $$10^{6}I_{p}$$ where p is the number of regression parameters. 
+<br> 
+<br> xty is the matrix $$X^{T}y$$ from the previous model. If there is no previous model
+<br> we initialise this with $$\textbf{0}_{p}$$. 
+<br> 
+<br> btrue is used to input the true regression parameters and is included to allow for analysis. 
+
+## Example 
+Consider the following example where we have a design matrix 
+<br> $$X =   \left(\begin{array}{cc} 
+1  & 0 & 0\\ 
+1 & 1 & 1 \\
+1 & 2 & 3 \\
+1 & 3 & 5\\
+1 & 4 & 4 \\
+1 & 5 & 4 \\
+\end{array}\right)$$
+<br> $$y = \left(\begin{array}{cc} 
+3\\ 
+5 \\
+6 \\
+8\\
+10\\
+11\\
+\end{array}\right) $$
+<br> Then $$(X^{T}X)^{-1} = \left(\begin{array}{cc} 
+0.599  & -0.035 & -0.121\\ 
+-0.035 & 0.211 & -0.174 \\
+-0.121 & -0.174 & 0.196 \\
+\end{array}\right)$$
+<br> and $$ X^{T}\textbf{y}=\left(\begin{array}{cc} 
+43\\ 
+136 \\
+147 \\
+\end{array}\right)$$
+<br> Then the OLS estimate is $${\hat{\beta}} = \left(\begin{array}{cc} 
+3.104\\ 
+1.642 \\
+-0.015 \\
+\end{array}\right)$$
+<br> Now we will first produce the regression parameter estimates from scratch i.e. no previous model. 
+```{r}
+library(onlinelearning)
+testdata = c(1,0,0,1,1,1,1,2,3,1,3,5,1,4,4,1,5,4)
+testdata = matrix(testdata,nrow = 6,ncol=3,byrow = TRUE)
+response = c(3,5,6,8,10,11)
+(beta = run_RLS(response,testdata)[1])
+```
+which gives us the OLS estimates as expected. 
+<br> If we already built a model from say the first three data points and we have 
+<br> just received three more data points we can then update our model. 
+```{r}
+(beta = (run_RLS(response,testdata,3,solve(t(testdata[1:3,])%*%testdata[1:3,]),t(testdata[1:3,]) %*% response[1:3]))[1])
+```
+which again gives us the OLS estimates. 
+
+# Aside
+For the rest of this vignete we will need the following functions. 
+<br> Note that we have not published these to the user. 
+<br>This function will compute the gradient of the loss function for either linear regression or logistic regression. 
+<br> This function has four input arguments.
+<br> x is the design matrix.
+<br> y is the response vector. 
+<br> b is the value of the regression parameters you wish to perform this calculation for.
+<br> reg has two options either "linear" or logistic" which specifies a linear regression loss function or logistic regression loss function respectively. 
+```{r}
+pred_error = function(reg, y, X, b_est) {
+  if (reg=="linear") {
+    # mean squared prediction error
+    return(sum((y - X %*% b_est)^2)/nrow(X))
+  } else if (reg=="logistic") {
+    # classification error rate
+    return(colMeans(sign(1/(1 + exp(-X%*%b_est))-0.5) != y))
+  }
+}
+```
+This function takes 4 input arguments. 
+<br> reg can take one of two options ""linear" or "logistic" for linear regression or logistic regression respectively. 
+<br> y is the response vector. 
+<br> X is the design matrix. 
+<br> b_est is our vector of estimates for the regression parameters. 
+
+```{r}
+est_error = function(b_true, b_est){
+  return(norm(b_true - b_est, type = "2"))
+}
+```
+This function computes the estimation errors and has two input arguments. 
+<br> b_true are the known regression parameters. 
+<br> b_est is our vector of estimates for the regression parameters. 
+
+# Online gradient descent
+```{r,error=TRUE,eval=FALSE}
+run_OGD(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
+```
+
+<br> This function has several input arguments. 
+<br> reg has two options "linear" or "logistic" for linear regression and logistic regression respectively. 
+<br> y is the response vector.
+<br> X is the design matrix. 
+<br> b_true is the vector of true regression parameters which is used for analysis. 
+<br> learn_rate specifies the learning rate for the algorithm. 
+<br> PR_ave indicates whether you want your estimates of the regression parameters to be subject to the Polyak-Ruppert average. 
+<br> The function outputs are 
+<br> the estimates of the regression parameters b_est, the past beta estimates b_est_past, the true regression parameters b_true, the estimation errors for each iteration est_error, and the prediction errors for each iteration pred_error. 
+
+# Data generator function 
+```{r,eval = FALSE, error = TRUE}
+sample_iid_data( reg,n = 1000,b_len = 500,bn0_len = 100,signal = 5,noise = 1)
+```
+
+<br> This function will be used to generate the data for the rest of our analyses. 
+<br> This has several inputs
+<br> reg has two options "linear" and "logistic" for linear and logistic regression respectively.
+<br> n, the number of data points we want to generate.
+<br> b_len, the number of regression parameters.
+<br> bno_len, is the number of non-zero regression parameters. 
+<br> signal, is the variance of the signal features. 
+<br> noise, is the variance of the error terms. 
+<br> The outputs are 
+<br> For linear regression, the response vector y, the design matrix X, the regression parameters b, and the error terms. 
+<br> For logistic regression, the response vector y, the design matrix X, the regression parameters b, and the vector of probabilities. 
+
+# Example 
+We can firstly simulate our regression data by 
+```{r}
+set.seed(123)
+regdata = sample_iid_data(reg = "linear", n=1000,b_len = 2000,bn0_len = 100,signal = 5,noise = 1)
+```
+We can then use OGD to estimate the regression parameters in the linear regression setting. 
+```{r}
+regogdemp = run_OGD(reg = "linear", y = regdata$y, X = regdata$X, b_true = regdata$b, learn_rate = 0.006,PR_ave = FALSE)
+```
+We can do the same in the logistic regression setting. 
+```{r}
+#Generate data 
+logdata = sample_iid_data(reg = "logistic", n=1000,b_len = 2000,bn0_len = 100)
+
+#Use OGD to find the regression parameters 
+logogdemp = run_OGD(reg = "logistic", y = logdata$y, X = logdata$X, b_true = logdata$b, learn_rate = 0.3,PR_ave = FALSE)
+```
+
+# Adaptive gradient descent
+```{r,error=TRUE,eval=FALSE}
+run_AdaGrad(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
+```
+
+<br>This function has several inputs.
+<br> reg, has two options "linear" or "logistic" for linear and logistic regression respectively.
+<br> y, the response vector. 
+<br> X, the design matrix. 
+<br> b_true, the true regression parameters. 
+<br> learn_rate, fixed constant we multiply our changing learning rate by. 
+<br> PR_ave, whether we want to subject our estimates to Polyak-Ruppert averaging. 
+<br> The outputs are, 
+<br> Our regression parameter estimates (b_est), past regression estimates (b_est_past),
+<br> the true regression parameters (b_true), the estimation errors (est_error) at each iteration,and the prediction errors at each iteration(pred_error). 
+
+# Example 
+We can estimate the regression parameters in the linear regression context using AGD. 
+```{r}
+regagdemp = run_AdaGrad(reg = "linear", y = regdata$y, X = regdata$X, b_true = regdata$b, learn_rate = 0.5,PR_ave = FALSE)
+```
+Similarly, in the logistic regression context. 
+```{r}
+logagdemp = run_AdaGrad(reg = "logistic", y = logdata$y, X = logdata$X, b_true = logdata$b, learn_rate = 0.5,PR_ave = FALSE)
+```
+
+# Plots 
+We have also provided a selection of some of the plots we used in our report. 
+```{r}
+#OGD, linear regression, true parameters in black, estimates in red. 
+plot(ts(regdata$b),xlab = "Coefficients",ylab = "Values")
+lines(regogdemp$b_est,col=2)
+
+#Plot the sorted estimates of the regression parameters for the signal variables for the case above. 
+plot(sort(regogdemp$b_est[1:100]),xlab = "Coefficients", ylab = "values",ylim = c(-14,14))
+points(regdata$b[order(sort(regogdemp$b_est[1:100]))],col = 2)
+segments(x0 = c(1:100), y0 = sort(regogdemp$b_est[1:100]), x1 =c(1:100), y1 = regdata$b[order(sort(regogdemp$b_est[1:100]))] )
+
+#Prediction errors in the regression context from OGD and AdaGD 
+plot(regogdemp$pred_error,type = "l",ylim = c(1000,10000),xlab = "Iteration",ylab = "Prediction error")
+lines(regagdemp$pred_error,col = 2)
+```
+
+
+
+
+
