@@ -2,13 +2,26 @@
 % Please edit documentation in R/functions.R
 \name{run_OMD}
 \alias{run_OMD}
-\title{Title}
+\title{Title 4}
 \usage{
 run_OMD(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 }
 \arguments{
-\item{PR_ave}{}
+\item{reg}{test}
+
+\item{y}{test}
+
+\item{X}{test}
+
+\item{b_true}{test}
+
+\item{learn_rate}{test}
+
+\item{PR_ave}{test}
+}
+\value{
+test
 }
 \description{
-Title
+Title 4
 }

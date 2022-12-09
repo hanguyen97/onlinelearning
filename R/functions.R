@@ -2,8 +2,6 @@
 #---------  ONLINE LEARNING ALGORITHMS  --------------------------#
 #-----------------------------------------------------------------#
 
-source(R/utils.R)
-
 #' Sample i.i.d data
 #'
 #' @param reg sample data from either [reg="linear"] or [reg = "logistic"]
@@ -50,8 +48,6 @@ sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise
 #'
 #' @return test
 #' @export
-#'
-#' @examples test
 run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
   b_len = length(b_true)
@@ -104,8 +100,6 @@ run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 #'
 #' @return test
 #' @export
-#'
-#' @examples test
 run_AdaGrad <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
   b_len = length(b_true)
@@ -159,8 +153,6 @@ run_AdaGrad <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 #'
 #' @return test
 #' @export
-#'
-#' @examples test
 OMD_step <- function(b, x, y, eta, reg){
   return(invgd_mp(gradient_mp(b) - eta*get_gradient(x, y, b, reg)))
 }
@@ -176,8 +168,6 @@ OMD_step <- function(b, x, y, eta, reg){
 #'
 #' @return test
 #' @export
-#'
-#' @examples test
 run_OMD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
   b_len = length(b_true)

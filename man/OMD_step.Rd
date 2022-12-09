@@ -7,7 +7,18 @@
 OMD_step(b, x, y, eta, reg)
 }
 \arguments{
-\item{reg}{}
+\item{b}{test}
+
+\item{x}{test}
+
+\item{y}{test}
+
+\item{eta}{test}
+
+\item{reg}{test}
+}
+\value{
+test
 }
 \description{
 Title
