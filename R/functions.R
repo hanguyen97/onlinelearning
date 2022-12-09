@@ -13,6 +13,7 @@
 #'* `y` response vector
 #'* `X` signal data
 #'* `b` coef vector
+#' @export
 sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise=1) {
 
   # generate X, beta and error
@@ -33,6 +34,37 @@ sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise
     y = rbinom(n, 1, py)
     return(list(y=y[index], X=X[index,], b = b, py=py[index]))
   }
+}
+
+
+#' Run recursive least squares
+#'
+#' @param Y response vector
+#' @param X signal data
+#' @param initial test
+#' @param invxtx test
+#' @param xty test
+#' @param btrue test
+#'
+#' @return
+#'* `y` response vector
+#'* `X` signal data
+#'* `b` coef vector
+#' @export
+run_RLS = function(Y,X, initial=0,invxtx= 10^6 *diag(nrow = dim(X)[2],ncol = dim(X)[2]),xty = matrix(0,nrow = dim(X)[2],ncol = 1),btrue = rep(0,dim(X)[2])){
+
+  beta = invxtx %*% xty
+  eeps = rep(1,dim(X)[2])
+  peps = rep(0,dim(X)[2])
+  for(i in 1:(length(Y)-initial)){
+    beta = beta + as.double((1/(1+as.matrix(t(X[initial+i,])) %*% invxtx %*% as.matrix(X[initial+i,])))) * invxtx %*% as.matrix(X[initial+i,]) %*% (Y[initial +i] - t(as.matrix(X[initial+i,])) %*% beta)
+    newx = as.matrix(X[initial+i,]) %*% t(as.matrix(X[initial+i,])) %*% invxtx
+    g = sum(diag(newx))
+    invxtx = invxtx - 1/(1+g) *invxtx %*% newx
+    eeps[i] = norm(beta-btrue,type = "2")
+    peps[i] = norm(Y - X %*% beta, type="2")/nrow(X)
+  }
+  return(list(beta,eeps,peps))
 }
 
 #' Run online gradient descent
