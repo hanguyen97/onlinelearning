@@ -4,7 +4,7 @@
 
 #' Sample i.i.d data
 #'
-#' @param reg sample data from either [reg="linear"] or [reg = "logistic"]
+#' @param reg sample data from either `reg='linear'` or `reg = 'logistic'`
 #' @param n sample size
 #' @param b_len length of coefficient beta vector
 #' @param bn0_len length of non-zero betas
@@ -15,6 +15,7 @@
 #'
 #' @returns test return
 #' @export
+#' @importFrom stats rbinom rnorm
 sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise=1) {
 
   # generate X, beta and error
@@ -37,7 +38,7 @@ sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise
   }
 }
 
-#' Title 1
+#' Run online gradient descent
 #'
 #' @param reg test
 #' @param y test
@@ -54,7 +55,7 @@ run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
   n_iter = nrow(X)
 
   # initialize beta
-  b_est = runif(b_len, 0, 1)
+  b_est = numeric(b_len)
   b_est_matrix = matrix(0, nrow = b_len, ncol = n_iter)
   est_error = numeric(n_iter)
   pred_error = numeric(n_iter)
@@ -106,7 +107,7 @@ run_AdaGrad <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
   n_iter = nrow(X)
 
   # initialize beta
-  b_est = runif(b_len, 0, 1)
+  b_est = numeric(b_len)
   b_est_matrix = matrix(0, nrow = b_len, ncol = n_iter)
   est_error = numeric(n_iter)
   pred_error = numeric(n_iter)
