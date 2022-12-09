@@ -18,19 +18,21 @@ sample_iid_data(
 
 \item{n}{sample size}
 
-\item{b_len}{length of coefficient beta vector}
+\item{b_len}{length of coefficient vector}
 
-\item{bn0_len}{length of non-zero betas}
+\item{bn0_len}{length of non-zero coefs}
 
 \item{signal}{standard deviation of an independent Gaussian distribution with mean 0
-from which the non-zero betas are drawn from}
+from which the non-zero coefs are drawn from}
+
 
 \item{noise}{standard deviation of a normal distribution with mean 0
 from which the error vector is drawn from}
 }
 \value{
-test return
-}
+* `y` response vector
+* `X` signal data
+* `b` coef vector
 \description{
 Sample i.i.d data
 }
