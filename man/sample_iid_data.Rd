@@ -14,24 +14,24 @@ sample_iid_data(
 )
 }
 \arguments{
-\item{reg}{sample data from either `reg="linear"` or `reg = "logistic"`}
+\item{reg}{sample data from either [reg="linear"] or [reg = "logistic"]}
 
 \item{n}{sample size}
 
-\item{b_len}{length of coefficient \beta vector}
+\item{b_len}{length of coefficient beta vector}
 
-\item{bn0_len}{length of non-zero \beta's}
+\item{bn0_len}{length of non-zero betas}
 
 \item{signal}{standard deviation of an independent Gaussian distribution with mean 0
-from which the non-zero \beta's are drawn from}
+from which the non-zero betas are drawn from}
 
 \item{noise}{standard deviation of a normal distribution with mean 0
 from which the error vector is drawn from}
 }
 \value{
-* `y` response vector
-* `X` signal data
-* `b` \beta vector
+* [y] response vector
+* [X] signal data
+* [b] beta vector
 }
 \description{
 Sample i.i.d data

@@ -1,18 +1,18 @@
 #' Sample i.i.d data
 #'
-#' @param reg sample data from either `reg="linear"` or `reg = "logistic"`
+#' @param reg sample data from either [reg="linear"] or [reg = "logistic"]
 #' @param n sample size
-#' @param b_len length of coefficient \beta vector
-#' @param bn0_len length of non-zero \beta's
+#' @param b_len length of coefficient beta vector
+#' @param bn0_len length of non-zero betas
 #' @param signal standard deviation of an independent Gaussian distribution with mean 0
-#' from which the non-zero \beta's are drawn from
+#' from which the non-zero betas are drawn from
 #' @param noise standard deviation of a normal distribution with mean 0
 #' from which the error vector is drawn from
 #'
 #' @returns
-#'* `y` response vector
-#'* `X` signal data
-#'* `b` \beta vector
+#'* [y] response vector
+#'* [X] signal data
+#'* [b] beta vector
 sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise=1) {
 
   # generate X, beta and error
