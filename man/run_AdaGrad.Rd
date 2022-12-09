@@ -2,26 +2,28 @@
 % Please edit documentation in R/functions.R
 \name{run_AdaGrad}
 \alias{run_AdaGrad}
-\title{Title 3}
+\title{Run adaptive gradient descent}
 \usage{
 run_AdaGrad(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 }
 \arguments{
-\item{reg}{test}
+\item{reg}{sample data from either `reg="linear"` or `reg = "logistic"`}
 
-\item{y}{test}
+\item{y}{response vector}
 
-\item{X}{test}
+\item{X}{signal data}
 
-\item{b_true}{test}
+\item{b_true}{true coefficients}
 
-\item{learn_rate}{test}
+\item{learn_rate}{learning rate}
 
-\item{PR_ave}{test}
+\item{PR_ave}{logical; for Polyak-Ruppert averaging}
 }
 \value{
-test
+* `y` response vector
+* `X` signal data
+* `b` coef vector
 }
 \description{
-Title 3
+Run adaptive gradient descent
 }
