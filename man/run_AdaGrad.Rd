@@ -7,7 +7,7 @@
 run_AdaGrad(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 }
 \arguments{
-\item{reg}{sample data from either `reg="linear"` or `reg = "logistic"`}
+\item{reg}{sample data from either \code{reg="linear"} or \code{reg = "logistic"}}
 
 \item{y}{response vector}
 
@@ -20,10 +20,19 @@ run_AdaGrad(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 \item{PR_ave}{logical; for Polyak-Ruppert averaging}
 }
 \value{
-* `y` response vector
-* `X` signal data
-* `b` coef vector
+\itemize{
+\item \code{y} response vector
+\item \code{X} signal data
+\item \code{b} coef vector
+}
 }
 \description{
 Run adaptive gradient descent
+}
+\examples{
+set.seed(123)
+data_lr <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
+res_lr <- run_AdaGrad(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
+data_lg <- sample_iid_data(reg="logistic", n=1000, b_len=10, bn0_len=8)
+res_lg <- run_AdaGrad(y=data$y, X=data$X, b_true=data$b, reg="logistic", learn_rate=0.01)
 }

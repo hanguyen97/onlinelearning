@@ -27,9 +27,11 @@ run_RLS(
 \item{btrue}{test}
 }
 \value{
-* `y` response vector
-* `X` signal data
-* `b` coef vector
+\itemize{
+\item \code{y} response vector
+\item \code{X} signal data
+\item \code{b} coef vector
+}
 }
 \description{
 Run recursive least squares

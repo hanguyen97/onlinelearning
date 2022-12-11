@@ -12,7 +12,9 @@
 #' @returns
 #'* `y` response vector
 #'* `X` signal data
-#'* `b` coef vector
+#'* `b` coefficient vector
+#'* `e` residual (for linear regression only)
+#'* `py` probability vector P(y_t = 1| x_t) (for logistic regression only)
 #' @export
 #' @examples 
 #' set.seed(123)

@@ -14,7 +14,7 @@ sample_iid_data(
 )
 }
 \arguments{
-\item{reg}{sample data from either `reg="linear"` or `reg = "logistic"`}
+\item{reg}{sample data from either \code{reg="linear"} or \code{reg = "logistic"}}
 
 \item{n}{sample size}
 
@@ -29,10 +29,19 @@ from which the non-zero coefs are drawn from}
 from which the error vector is drawn from}
 }
 \value{
-* `y` response vector
-* `X` signal data
-* `b` coef vector
+\itemize{
+\item \code{y} response vector
+\item \code{X} signal data
+\item \code{b} coefficient vector
+\item \code{e} residual (for linear regression only)
+\item \code{py} probability vector P(y_t = 1| x_t) (for logistic regression only)
+}
 }
 \description{
 Sample i.i.d data
+}
+\examples{
+set.seed(123)
+data_lr <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
+data_lg <- sample_iid_data(reg="logistic", n=1000, b_len=10, bn0_len=8)
 }
