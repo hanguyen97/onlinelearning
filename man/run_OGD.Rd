@@ -7,7 +7,7 @@
 run_OGD(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 }
 \arguments{
-\item{reg}{sample data from either \code{reg="linear"} or \code{reg = "logistic"}}
+\item{reg}{run linear \code{reg="linear"} or logistic \code{reg = "logistic"} regression}
 
 \item{y}{response vector}
 
@@ -21,9 +21,10 @@ run_OGD(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 }
 \value{
 \itemize{
-\item \code{y} response vector
-\item \code{X} signal data
-\item \code{b} coef vector
+\item \code{b_est} estimated coefficients
+\item \code{b_true} true coefficients
+\item \code{est_error} estimation error
+\item \code{pred_error} prediction error
 }
 }
 \description{
@@ -31,8 +32,6 @@ Run online gradient descent
 }
 \examples{
 set.seed(123)
-data_lr <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
-res_lr <- run_OGD(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
-data_lg <- sample_iid_data(reg="logistic", n=1000, b_len=10, bn0_len=8)
-res_lg <- run_OGD(y=data$y, X=data$X, b_true=data$b, reg="logistic", learn_rate=0.01)
+data <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
+run_OGD(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
 }

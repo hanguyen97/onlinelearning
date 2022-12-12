@@ -16,23 +16,31 @@ run_RLS(
 \arguments{
 \item{Y}{response vector}
 
-\item{X}{signal data}
+\item{X}{design matrix}
 
-\item{initial}{test}
+\item{initial}{how many data points you have used in your previous model}
 
-\item{invxtx}{test}
+\item{invxtx}{\eqn{(X^{T}X)^{-1}} from previous model. If there is no previous OLS model
+\eqn{10^{6}I_{p}} is used where p is the number of regression parameters}
 
-\item{xty}{test}
+\item{xty}{matrix \eqn{X^{T}y} from previous OLS model. If there is no previous model
+\eqn{0_{p}} is used.}
 
-\item{btrue}{test}
+\item{btrue}{true coefficients}
 }
 \value{
 \itemize{
-\item \code{y} response vector
-\item \code{X} signal data
-\item \code{b} coef vector
+\item \code{beta} estimated coefficients
+\item \code{eeps} estimation error
+\item \code{peps} prediction error
 }
 }
 \description{
 Run recursive least squares
+}
+\examples{
+testdata = c(1,0,0,1,1,1,1,2,3,1,3,5,1,4,4,1,5,4)
+testdata = matrix(testdata,nrow = 6,ncol=3,byrow = TRUE)
+response = c(3,5,6,8,10,11)
+(beta = run_RLS(response,testdata)[1])
 }

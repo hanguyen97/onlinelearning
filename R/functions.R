@@ -8,7 +8,7 @@
 #' from which the non-zero coefs are drawn from
 #' @param noise standard deviation of a normal distribution with mean 0
 #' from which the error vector is drawn from
-#'
+#' @importFrom stats rbinom rnorm
 #' @returns
 #'* `y` response vector
 #'* `X` signal data
@@ -46,17 +46,24 @@ sample_iid_data <- function(reg, n=1000, b_len=500, bn0_len=100, signal=5, noise
 #' Run recursive least squares
 #'
 #' @param Y response vector
-#' @param X signal data
-#' @param initial test
-#' @param invxtx test
-#' @param xty test
-#' @param btrue test
+#' @param X design matrix
+#' @param initial how many data points you have used in your previous model
+#' @param invxtx \eqn{(X^{T}X)^{-1}} from previous model. If there is no previous OLS model 
+#' \eqn{10^{6}I_{p}} is used where p is the number of regression parameters
+#' @param xty matrix \eqn{X^{T}y} from previous OLS model. If there is no previous model
+#' \eqn{0_{p}} is used.
+#' @param btrue true coefficients
 #'
 #' @return
-#'* `y` response vector
-#'* `X` signal data
-#'* `b` coef vector
+#'* `beta` estimated coefficients
+#'* `eeps` estimation error
+#'* `peps` prediction error
 #' @export
+#' @examples 
+#' testdata = c(1,0,0,1,1,1,1,2,3,1,3,5,1,4,4,1,5,4)
+#' testdata = matrix(testdata,nrow = 6,ncol=3,byrow = TRUE)
+#' response = c(3,5,6,8,10,11)
+#' (beta = run_RLS(response,testdata)[1])
 run_RLS = function(Y,X, initial=0,invxtx= 10^6 *diag(nrow = dim(X)[2],ncol = dim(X)[2]),xty = matrix(0,nrow = dim(X)[2],ncol = 1),btrue = rep(0,dim(X)[2])){
 
   beta = invxtx %*% xty
@@ -76,7 +83,7 @@ run_RLS = function(Y,X, initial=0,invxtx= 10^6 *diag(nrow = dim(X)[2],ncol = dim
 
 #' Run online gradient descent
 #'
-#' @param reg sample data from either `reg="linear"` or `reg = "logistic"`
+#' @param reg run linear `reg="linear"` or logistic `reg = "logistic"` regression
 #' @param y response vector
 #' @param X signal data
 #' @param b_true true coefficients
@@ -84,17 +91,15 @@ run_RLS = function(Y,X, initial=0,invxtx= 10^6 *diag(nrow = dim(X)[2],ncol = dim
 #' @param PR_ave logical; for Polyak-Ruppert averaging
 #'
 #' @return
-#'* `y` response vector
-#'* `X` signal data
-#'* `b` coef vector
+#'* `b_est` estimated coefficients
+#'* `b_true` true coefficients
+#'* `est_error` estimation error
+#'* `pred_error` prediction error
 #' @export
 #' @examples 
 #' set.seed(123)
-#' data_lr <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
-#' res_lr <- run_OGD(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
-# 
-#' data_lg <- sample_iid_data(reg="logistic", n=1000, b_len=10, bn0_len=8)
-#' res_lg <- run_OGD(y=data$y, X=data$X, b_true=data$b, reg="logistic", learn_rate=0.01)
+#' data <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
+#' run_OGD(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
 run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
   b_len = length(b_true)
@@ -129,7 +134,7 @@ run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
   }
 
   return(list(b_est = b_est,
-              b_est_past = b_est_matrix,
+              # b_est_past = b_est_matrix,
               b_true = b_true,
               est_error = est_error,
               pred_error = pred_error))
@@ -138,7 +143,7 @@ run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
 #' Run adaptive gradient descent
 #'
-#' @param reg sample data from either `reg="linear"` or `reg = "logistic"`
+#' @param reg run linear `reg="linear"` or logistic `reg = "logistic"` regression
 #' @param y response vector
 #' @param X signal data
 #' @param b_true true coefficients
@@ -146,17 +151,15 @@ run_OGD <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 #' @param PR_ave logical; for Polyak-Ruppert averaging
 #'
 #' @return
-#'* `y` response vector
-#'* `X` signal data
-#'* `b` coef vector
+#'* `b_est` estimated coefficients
+#'* `b_true` true coefficients
+#'* `est_error` estimation error
+#'* `pred_error` prediction error
 #' @export
 #' @examples 
 #' set.seed(123)
-#' data_lr <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
-#' res_lr <- run_AdaGrad(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
-# 
-#' data_lg <- sample_iid_data(reg="logistic", n=1000, b_len=10, bn0_len=8)
-#' res_lg <- run_AdaGrad(y=data$y, X=data$X, b_true=data$b, reg="logistic", learn_rate=0.01)
+#' data <- sample_iid_data(reg="linear", n=1000, b_len=10, bn0_len=8)
+#' run_AdaGrad(y=data$y, X=data$X, b_true=data$b, reg="linear", learn_rate=0.01)
 run_AdaGrad <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
 
   b_len = length(b_true)
@@ -193,7 +196,7 @@ run_AdaGrad <- function(reg, y, X, b_true, learn_rate, PR_ave=TRUE) {
   }
 
   return(list(b_est = b_est,
-              b_est_past = b_est_matrix,
+              # b_est_past = b_est_matrix,
               b_true = b_true,
               est_error = est_error,
               pred_error = pred_error))
