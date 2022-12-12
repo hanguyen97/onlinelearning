@@ -9,28 +9,21 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 # Introduction 
-In this vignette we will implement code to carry out the following algorithms: Recursive <br>Least Squares(RLS), Online Gradient Descent (OGD), and Adaptive Gradient Descent. 
-<br> We will show you how these functions work with some simple examples. 
-<br> Finally we will show you how we gathered some of the results from our report. 
+In this vignette we will implement code to carry out the following algorithms: Recursive Least Squares(RLS), Online Gradient Descent (OGD), and Adaptive Gradient Descent (AdaGrad). We will show you how these functions work with some simple examples. Finally we will show you how we gathered some of the results from our report. 
 
 # Recursive Least Squares
 ```{r,error=TRUE,eval=FALSE}
 run_RLS( Y,X,initial = 0,invxtx = 10^6 * diag(nrow = dim(X)[2], ncol = dim(X)[2]),xty = matrix(0, nrow = dim(X)[2], ncol = 1),btrue = rep(0, dim(X)[2]))
 ```
 
-<br> The function has several input arguments. 
-<br> Y is for your response vector. 
+<br> The function has several input arguments: Y is for your response vector, and X is for your design matrix. 
 <br>
-<br> X is for your design matrix. 
-<br>
-<br> Initial tells us how many data points you have used in your previous model. If initial <br>is zero we will compute the estimate for the regression parameters from scratch. If <br>initial is greater than 0 we will take your previous model (assuming later data points <br>are added to the bottom of the design matrix) and update it to reflect any new data <br>points received. 
+<br> Initial tells us how many data points you have used in your previous model. If initial is zero we will compute the estimate for the regression parameters from scratch. If initial is greater than 0 we will take your previous model (assuming later data points are added to the bottom of the design matrix) and update it to reflect any new data points received. 
 <br> 
 <br> The function outputs are the regression parameter estimates, the estimation errors,and prediction errors, beta,eeps,peps respectively. 
-<br>invxtx is $$(X^{T}X)^{-1}$$ from your previous model. If there is no previous model 
-<br> we inialise the algorithm with $$10^{6}I_{p}$$ where p is the number of regression parameters. 
+<br>invxtx is $$(X^{T}X)^{-1}$$ from your previous model. If there is no previous model we inialise the algorithm with $$10^{6}I_{p}$$ where p is the number of regression parameters. 
 <br> 
-<br> xty is the matrix $$X^{T}y$$ from the previous model. If there is no previous model
-<br> we initialise this with $$\textbf{0}_{p}$$. 
+<br> xty is the matrix $$X^{T}y$$ from the previous model. If there is no previous model we initialise this with $$\textbf{0}_{p}$$. 
 <br> 
 <br> btrue is used to input the true regression parameters and is included to allow for analysis. 
 
@@ -76,8 +69,7 @@ response = c(3,5,6,8,10,11)
 (beta = run_RLS(response,testdata)[1])
 ```
 which gives us the OLS estimates as expected. 
-<br> If we already built a model from say the first three data points and we have 
-<br> just received three more data points we can then update our model. 
+<br> If we already built a model from say the first three data points and we have just received three more data points we can then update our model. 
 ```{r}
 (beta = (run_RLS(response,testdata,3,solve(t(testdata[1:3,])%*%testdata[1:3,]),t(testdata[1:3,]) %*% response[1:3]))[1])
 ```
@@ -118,21 +110,6 @@ This function computes the estimation errors and has two input arguments.
 <br> b_true are the known regression parameters. 
 <br> b_est is our vector of estimates for the regression parameters. 
 
-# Online gradient descent
-```{r,error=TRUE,eval=FALSE}
-run_OGD(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
-```
-
-<br> This function has several input arguments. 
-<br> reg has two options "linear" or "logistic" for linear regression and logistic regression respectively. 
-<br> y is the response vector.
-<br> X is the design matrix. 
-<br> b_true is the vector of true regression parameters which is used for analysis. 
-<br> learn_rate specifies the learning rate for the algorithm. 
-<br> PR_ave indicates whether you want your estimates of the regression parameters to be subject to the Polyak-Ruppert average. 
-<br> The function outputs are 
-<br> the estimates of the regression parameters b_est, the past beta estimates b_est_past, the true regression parameters b_true, the estimation errors for each iteration est_error, and the prediction errors for each iteration pred_error. 
-
 # Data generator function 
 ```{r,eval = FALSE, error = TRUE}
 sample_iid_data( reg,n = 1000,b_len = 500,bn0_len = 100,signal = 5,noise = 1)
@@ -149,6 +126,20 @@ sample_iid_data( reg,n = 1000,b_len = 500,bn0_len = 100,signal = 5,noise = 1)
 <br> The outputs are 
 <br> For linear regression, the response vector y, the design matrix X, the regression parameters b, and the error terms. 
 <br> For logistic regression, the response vector y, the design matrix X, the regression parameters b, and the vector of probabilities. 
+
+# Online gradient descent
+```{r,error=TRUE,eval=FALSE}
+run_OGD(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
+```
+
+<br>This function has several inputs.
+<br> reg, has two options "linear" or "logistic" for linear and logistic regression respectively.
+<br> y: the response vector. 
+<br> X: the design matrix. 
+<br> b_true: the true regression parameters. 
+<br> learn_rate: fixed constant we multiply our changing learning rate by. 
+<br> PR_ave: whether we want to subject our estimates to Polyak-Ruppert averaging. 
+<br> The outputs are: regression parameter estimates (b_est), the true regression parameters (b_true), the estimation errors (est_error) at each iteration, and the prediction errors at each iteration (pred_error). 
 
 # Example 
 We can firstly simulate our regression data by 
@@ -176,14 +167,12 @@ run_AdaGrad(reg, y, X, b_true, learn_rate, PR_ave = TRUE)
 
 <br>This function has several inputs.
 <br> reg, has two options "linear" or "logistic" for linear and logistic regression respectively.
-<br> y, the response vector. 
-<br> X, the design matrix. 
-<br> b_true, the true regression parameters. 
-<br> learn_rate, fixed constant we multiply our changing learning rate by. 
-<br> PR_ave, whether we want to subject our estimates to Polyak-Ruppert averaging. 
-<br> The outputs are, 
-<br> Our regression parameter estimates (b_est), past regression estimates (b_est_past),
-<br> the true regression parameters (b_true), the estimation errors (est_error) at each iteration,and the prediction errors at each iteration(pred_error). 
+<br> y: the response vector. 
+<br> X: the design matrix. 
+<br> b_true: the true regression parameters. 
+<br> learn_rate: fixed constant we multiply our changing learning rate by. 
+<br> PR_ave: whether we want to subject our estimates to Polyak-Ruppert averaging. 
+<br> The outputs are: regression parameter estimates (b_est), the true regression parameters (b_true), the estimation errors (est_error) at each iteration, and the prediction errors at each iteration (pred_error). 
 
 # Example 
 We can estimate the regression parameters in the linear regression context using AGD. 
